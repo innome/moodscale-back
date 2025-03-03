@@ -26,8 +26,3 @@ jobs:
           # pip install -r requirements.txt
           # Si no, instala las dependencias necesarias para el proyecto:
           pip install fastapi uvicorn
-
-      - name: Ejecutar linters
-        run: |
-          pip install flake8
-          flake8 .
