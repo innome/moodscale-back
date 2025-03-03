@@ -1,0 +1,52 @@
+[
+    {
+        "emotion": "felicidad",
+        "intensity": 5,
+        "responses": {
+            "0": 3,
+            "1": 4
+        },
+        "date": "2025-02-22",
+        "note": "Termine este codigo en una hora y diez minutos, el front igual me dio problemas"
+    },
+    {
+        "emotion": "felicidad",
+        "intensity": 5,
+        "responses": {
+            "0": 4,
+            "1": 4
+        },
+        "date": "2025-03-03",
+        "note": "Mi crush del gym me habl\u00f3"
+    },
+    {
+        "emotion": "tristeza",
+        "intensity": 3,
+        "responses": {
+            "0": 1,
+            "1": 3
+        },
+        "date": "2025-03-03",
+        "note": "sad"
+    },
+    {
+        "emotion": "ira",
+        "intensity": 1,
+        "responses": {
+            "0": 2,
+            "1": 5
+        },
+        "date": "2025-03-03",
+        "note": "ada"
+    },
+    {
+        "emotion": "ira",
+        "intensity": 3,
+        "responses": {
+            "0": 2,
+            "1": 3
+        },
+        "date": "2025-03-03",
+        "note": "a"
+    }
+]
