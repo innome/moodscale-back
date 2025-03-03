@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v2
+
+      - name: Configurar Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          # Si tienes un archivo requirements.txt, descomenta la siguiente línea:
+          # pip install -r requirements.txt
+          # Si no, instala las dependencias necesarias para el proyecto:
+          pip install fastapi uvicorn
+
+      - name: Ejecutar linters
+        run: |
+          pip install flake8
+          flake8 .
