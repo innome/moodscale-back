@@ -1,41 +1,64 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Optional
+from typing import Dict, Optional
 import datetime
 import json
 import os
 from fastapi.middleware.cors import CORSMiddleware
-import datetime
+from fastapi.responses import HTMLResponse
+from time import time
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+html = f"""
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>FastAPI on Vercel</title>
+        <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+    </head>
+    <body>
+        <div class="bg-gray-200 p-4 rounded-lg shadow-lg">
+            <h1>Hello from FastAPI@{__version__}</h1>
+            <ul>
+                <li><a href="/docs">/docs</a></li>
+                <li><a href="/redoc">/redoc</a></li>
+            </ul>
+            <p>Powered by <a href="https://vercel.com" target="_blank">Vercel</a></p>
+        </div>
+    </body>
+</html>
+"""
+
 
 # Archivo de almacenamiento
 DATA_FILE = "emotions_log.json"
 
-app = FastAPI()
-
 origins = [
     "http://127.0.0.1:5173",  # Ajusta al puerto de tu frontend (Vite)
-    "http://localhost:5173",  # Ajusta si usas localhost
+    "http://localhost:5173",
+    "https://moodscale-front.vercel.app/"  # Ajusta si usas localhost
     # Agrega aquí otras URL permitidas si tienes un dominio
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,        # or ["*"] para permitir a cualquiera (no recomendable en producción)
+    allow_origins=origins,        # O puedes usar ["*"] en desarrollo
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-
-
+# Función para convertir objetos no serializables
 def default_converter(obj):
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
     raise TypeError(f"Type {type(obj)} not serializable")
 
+# Función para guardar datos en archivo utilizando el convertidor
 def save_data(data):
     with open(DATA_FILE, "w") as file:
         json.dump(data, file, indent=4, default=default_converter)
@@ -58,7 +81,7 @@ def save_data(data):
 
 emotions_log = load_data()
 
-# Base de datos de preguntas por emoción (más extensa)
+# Base de datos de preguntas por emoción
 questions_db = {
     "tristeza": [
         {
@@ -169,26 +192,24 @@ questions_db = {
     ]
 }
 
-
 class EmotionEntry(BaseModel):
     emotion: str
     intensity: int
     responses: Dict[str, int]
-    date: str  # en vez de datetime.date
+    date: str  # Se usa string para la fecha
     note: Optional[str] = None  # Campo opcional para la nota
 
 @app.post("/log_emotion/")
 def log_emotion(entry: EmotionEntry):
     if entry.emotion not in questions_db:
         raise HTTPException(status_code=400, detail="Emoción no válida")
-
-    # Convertir la fecha a string para evitar error "Object of type date is not JSON serializable"
+    
+    # Convertir la fecha a string (en caso de que no lo sea)
     entry_data = entry.dict()
     entry_data["date"] = str(entry_data["date"])
 
-    # Guardar en la lista en memoria
+    # Guardar en la lista en memoria y en archivo JSON
     emotions_log.append(entry_data)
-    # Guardar en archivo JSON
     save_data(emotions_log)
     return {"message": "Emoción registrada exitosamente"}
 
@@ -246,4 +267,8 @@ def get_entries():
 
 @app.get("/")
 def main():
-    return "Microservicios Funcionando"
+    return HTMLResponse(html)
+
+@app.get('/ping')
+async def hello():
+    return {'res': 'pong', 'version': __version__, "time": time()}
