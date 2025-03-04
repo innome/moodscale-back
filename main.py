@@ -1,7 +1,7 @@
 from time import time
-from fastapi import FastAPI, __version__
+from fastapi import FastAPI, __version__, Request, Response, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from extra import router as extra_router
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,6 +13,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.options("/{full_path:path}")
+async def preflight_handler(request: Request, full_path: str):
+    return Response(headers={
+        "Access-Control-Allow-Origin": "https://moodscale-front.vercel.app",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    })
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers={"Access-Control-Allow-Origin": "https://moodscale-front.vercel.app"}
+    )
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(extra_router)
 
