@@ -9,17 +9,11 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(extra_router)
 
-origins = [
-    "http://127.0.0.1:5173",  # Ajusta al puerto de tu frontend (Vite)
-    "http://localhost:5173",
-    "https://moodscale-front.vercel.app",
-    "moodscale-front.vercel.app/"  # Ajusta si usas localhost
-    # Agrega aquí otras URL permitidas si tienes un dominio
-]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,        # or ["*"] para permitir a cualquiera (no recomendable en producción)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
