@@ -7,8 +7,11 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from time import time
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 html = f"""
 <!DOCTYPE html>
