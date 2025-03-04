@@ -6,13 +6,13 @@ import json
 import os
 from fastapi.middleware.cors import CORSMiddleware
 import datetime
+from mangum import Mangum
 
 app = FastAPI()
 
 # Archivo de almacenamiento
 DATA_FILE = "emotions_log.json"
-
-app = FastAPI()
+handler = Mangum(app)
 
 origins = [
     "http://127.0.0.1:5173",  # Ajusta al puerto de tu frontend (Vite)
