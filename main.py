@@ -9,7 +9,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://moodscale-front.vercel.app"],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
