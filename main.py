@@ -3,10 +3,27 @@ from fastapi import FastAPI, __version__
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from extra import router as extra_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(extra_router)
+
+origins = [
+    "http://127.0.0.1:5173",  # Ajusta al puerto de tu frontend (Vite)
+    "http://localhost:5173",
+    "https://moodscale-front.vercel.app"  # Ajusta si usas localhost
+    # Agrega aquí otras URL permitidas si tienes un dominio
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,        # or ["*"] para permitir a cualquiera (no recomendable en producción)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 html = f"""
 <!DOCTYPE html>
