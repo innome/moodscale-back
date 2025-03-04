@@ -2,9 +2,10 @@
 import datetime
 import json
 import os
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel
 from typing import Dict, Optional
+from fastapi.responses import HTMLResponse, JSONResponse
 
 router = APIRouter()
 
@@ -154,11 +155,27 @@ class EmotionEntry(BaseModel):
     date: str  # Se usa string para la fecha
     note: Optional[str] = None  # Campo opcional para la nota
 
+@router.options("/{full_path:path}")
+async def preflight_handler(request: Request, full_path: str):
+    return Response(headers={
+        "Access-Control-Allow-Origin": "https://moodscale-front.vercel.app",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    })
+
+@router.exception_handler(HTTPException)
+async def http_exception_handler(request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers={"Access-Control-Allow-Origin": "https://moodscale-front.vercel.app"}
+    )
+
 @router.post("/log_emotion/")
 def log_emotion(entry: EmotionEntry):
     if entry.emotion not in questions_db:
         raise HTTPException(status_code=400, detail="Emoción no válida")
-    
+
     entry_data = entry.dict()
     entry_data["date"] = str(entry_data["date"])
     emotions_log.append(entry_data)
