@@ -6,11 +6,6 @@ from extra import router as extra_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.include_router(extra_router)
-
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,6 +13,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.include_router(extra_router)
 
 
 html = f"""
